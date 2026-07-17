@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Πρόγραμμα Ναυαγοσωστών</title>
+<style>
+  :root {
+    --title-bg: #1F4E78;
+    --head-bg: #2E75B6;
+    --open-bg: #DDEBF7;
+    --close-bg: #FCE4D6;
+    --rest-bg: #E7E6E6;
+    --shortage-bg: #FFC7CE;
+    --shortage-fg: #9C0006;
+    --ok-bg: #C6EFCE;
+    --ok-fg: #1e6b1e;
+    --border: #B7B7B7;
+    --page-bg: #f4f6f8;
+    --panel-bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, "Segoe UI", sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    margin: 0;
+    padding: 24px;
+  }
+  h1 {
+    background: var(--title-bg);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 0 0 20px 0;
+    font-size: 1.4rem;
+  }
+  .panel {
+    background: var(--panel-bg);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .panel h2 {
+    margin-top: 0;
+    font-size: 1.05rem;
+    color: var(--title-bg);
+    border-bottom: 2px solid var(--head-bg);
+    padding-bottom: 6px;
+  }
+  details.panel summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--title-bg);
+    font-size: 1.05rem;
+  }
+  details.panel[open] summary { margin-bottom: 10px; }
+  .instructions p { margin: 6px 0; line-height: 1.5; font-size: 0.92rem; }
+  .instructions strong { color: var(--title-bg); }
+
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px 20px;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 0.8rem; font-weight: bold; color: var(--muted); }
+  .field select, .field input {
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: #fff;
+    color: var(--text);
+  }
+  .people-rest {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  .table-scroll { overflow-x: auto; }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  thead th {
+    background: var(--head-bg);
+    color: #fff;
+  }
+  td.rowlabel, th.rowlabel {
+    text-align: left;
+    font-weight: bold;
+    background: #f0f0f0;
+    white-space: nowrap;
+  }
+  .shift-Ρεπό { background: var(--rest-bg); }
+  .shift-Άνοιγμα { background: var(--open-bg); }
+  .shift-Κλείσιμο { background: var(--close-bg); }
+  .check-bad { background: var(--shortage-bg); color: var(--shortage-fg); font-weight: bold; }
+  .check-ok { background: var(--ok-bg); color: var(--ok-fg); font-weight: bold; }
+  .section-gap { margin-top: 22px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 0.8rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: inline-block; }
+  footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 30px; }
+  @media print {
+    details.panel:not(.always-print) { display: none; }
+    body { background: #fff; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>ΠΡΟΓΡΑΜΜΑ ΝΑΥΑΓΟΣΩΣΤΩΝ</h1>
+
+<details class="panel">
+  <summary>Οδηγίες</summary>
+  <div class="instructions">
+    <p><strong>Τι είναι:</strong> Εβδομαδιαίο πρόγραμμα για 6 ναυαγοσώστες σε 4 θέσεις (Μπουσουλάς, Infinity Pool, Main Pool, Splash Pool). Άλλαξε τις παραμέτρους παρακάτω και το πρόγραμμα ενημερώνεται αμέσως.</p>
+    <p><strong>Κανόνες:</strong> Ο Γιάννης είναι πάντα στον Μπουσουλά όποτε δουλεύει. Ο Οδυσσέας είναι πάντα στο Infinity Pool όποτε δουλεύει. Καθένας έχει 1 ρεπό/εβδομάδα. Την ημέρα πριν το ρεπό του κάνει «Άνοιγμα», τις άλλες μέρες «Κλείσιμο». Στο ρεπό του Γιάννη, ο Οδυσσέας καλύπτει τον Μπουσουλά. Όποτε ο Οδυσσέας λείπει από το Infinity Pool, καλύπτει ο ναυαγοσώστης που έχεις ορίσει στην «Κάλυψη Infinity Pool». Οι υπόλοιποι εναλλάσσονται σε Main Pool / Splash Pool.</p>
+    <p><strong>Μέρες χωρίς φυσικό «Άνοιγμα»:</strong> Με 6 άτομα σε 7 μέρες, κάποιες μέρες μπορεί να μην ανοίγει κανείς φυσικά — τότε ανοίγει αυτόματα κάποιος που δουλεύει εκείνη τη μέρα (πρώτα ο «Εφεδρικός Ανοίγματος», αν δουλεύει· αλλιώς όποιος άλλος δουλεύει), ώστε να υπάρχει πάντα τουλάχιστον 1 άτομο σε «Άνοιγμα».</p>
+    <p><strong>Κυκλική μετάθεση ρεπό &amp; ποστών:</strong> Τα ρεπό στις Παραμέτρους ισχύουν ακριβώς όπως τα βλέπεις για την τρέχουσα πραγματική εβδομάδα. Κάθε επόμενη εβδομάδα, το ρεπό του καθενός μετατίθεται κυκλικά μία μέρα προς τα δεξιά (π.χ. όποιος είχε Κυριακή θα έχει Δευτέρα την επόμενη), και ομοίως εναλλάσσεται η κατανομή Main/Splash Pool — έτσι η δίκαιη κατανομή διατηρείται αυτόματα εβδομάδα με την εβδομάδα, χωρίς να χρειάζεται να ξαναγράφεις τίποτα. Δίπλα σε κάθε ρεπό βλέπεις την ενεργή τιμή για την επιλεγμένη εβδομάδα.</p>
+    <p><strong>Χρωματικός κώδικας:</strong> Γαλάζιο = Άνοιγμα. Πορτοκαλί = Κλείσιμο. Γκρι = Ρεπό. Πράσινο/κόκκινο στους ελέγχους = επαρκής/ανεπαρκής κάλυψη.</p>
+  </div>
+</details>
+
+<div class="panel">
+  <h2>Παράμετροι</h2>
+  <div class="field" style="max-width:220px; margin-bottom:6px;">
+    <label for="weekStart">Εβδομάδα από (Δευτέρα)</label>
+    <input type="date" id="weekStart">
+  </div>
+  <p id="rotationNote" style="font-size:0.78rem; color:var(--muted); margin:0 0 16px 0;"></p>
+
+  <div id="peopleRest" class="people-rest"></div>
+
+  <div class="param-grid">
+    <div class="field">
+      <label for="infinityCoverage">Κάλυψη Infinity Pool</label>
+      <select id="infinityCoverage"></select>
+    </div>
+    <div class="field">
+      <label for="backupOpener">Εφεδρικός Ανοίγματος</label>
+      <select id="backupOpener"></select>
+    </div>
+    <div class="field">
+      <label for="openHours">Ώρες Άνοιγμα</label>
+      <input type="text" id="openHours">
+    </div>
+    <div class="field">
+      <label for="closeHours">Ώρες Κλείσιμο</label>
+      <input type="text" id="closeHours">
+    </div>
+    <div class="field">
+      <label for="giannisHours">Γιάννης (κανονικά)</label>
+      <input type="text" id="giannisHours">
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Τελικές Βάρδιες</h2>
+  <div class="table-scroll"><table id="shiftTable"></table></div>
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--open-bg)"></span>Άνοιγμα</span>
+    <span><span class="swatch" style="background:var(--close-bg)"></span>Κλείσιμο</span>
+    <span><span class="swatch" style="background:var(--rest-bg)"></span>Ρεπό</span>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Θέσεις Εργασίας</h2>
+  <div class="table-scroll"><table id="positionTable"></table></div>
+</div>
+
+<div class="panel">
+  <h2>Βοηθητικός Πίνακας Ωρών</h2>
+  <div class="table-scroll"><table id="hoursTable"></table></div>
+</div>
+
+<div class="panel">
+  <h2>Έλεγχος Κάλυψης</h2>
+  <div class="table-scroll"><table id="checkTable"></table></div>
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--ok-bg)"></span>Επαρκής κάλυψη</span>
+    <span><span class="swatch" style="background:var(--shortage-bg)"></span>Ανεπαρκής κάλυψη</span>
+  </div>
+</div>
+
+<div style="text-align:center; margin-bottom:20px;">
+  <button id="printBtn" style="padding:8px 18px; font-size:0.9rem; border-radius:6px; border:1px solid var(--border); background:var(--head-bg); color:#fff; cursor:pointer;">Εκτύπωση / PDF</button>
+</div>
+
+<footer>Πρόγραμμα Ναυαγοσωστών &mdash; όλα τα δεδομένα αποθηκεύονται τοπικά στον browser σου.</footer>
+
+<script>
+const PEOPLE = ["Γιάννης", "Γιώτα", "Ραφαήλ", "Άρης", "Οδυσσέας", "Κώστας"];
+const ROTATORS = ["Γιώτα", "Ραφαήλ", "Άρης", "Κώστας"];
+const DAY_NAMES = ["Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο", "Κυριακή"];
+const BEACH = "Μπουσουλάς";
+const POSITIONS = [BEACH, "Infinity Pool", "Main Pool", "Splash Pool"];
+const DEFAULT_REST = {
+  "Γιάννης": "Κυριακή",
+  "Γιώτα": "Δευτέρα",
+  "Ραφαήλ": "Τρίτη",
+  "Άρης": "Τετάρτη",
+  "Οδυσσέας": "Πέμπτη",
+  "Κώστας": "Παρασκευή",
+};
+const STORAGE_KEY = "lifeguard_schedule_params_v1";
+
+function mondayOfCurrentWeek() {
+  const d = new Date();
+  const jsDay = d.getDay(); // 0=Sun..6=Sat
+  const isoDay = jsDay === 0 ? 7 : jsDay; // 1=Mon..7=Sun
+  d.setDate(d.getDate() - (isoDay - 1));
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function toDateInputValue(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+// Rest days (and pool posts) rotate one weekday forward every week, wrapping
+// Κυριακή -> Δευτέρα. The values in "Παράμετροι" describe THIS real calendar
+// week (rotation offset 0); every other week is derived from them, so there
+// is nothing to store or lose — jumping to any past/future week always
+// reproduces the same rotation deterministically.
+const ROTATION_ANCHOR = mondayOfCurrentWeek();
+
+function weeksBetween(weekStartDate) {
+  const diffDays = Math.round((weekStartDate.getTime() - ROTATION_ANCHOR.getTime()) / 86400000);
+  return Math.round(diffDays / 7);
+}
+
+function rotationOffsetFor(weekStartValue) {
+  const weekStartDate = new Date(weekStartValue + "T00:00:00");
+  const weeks = weeksBetween(weekStartDate);
+  return ((weeks % 7) + 7) % 7;
+}
+
+function defaultParams() {
+  return {
+    weekStart: toDateInputValue(mondayOfCurrentWeek()),
+    rest: { ...DEFAULT_REST },
+    infinityCoverage: "Ραφαήλ",
+    backupOpener: "Κώστας",
+    openHours: "9:00-17:30",
+    closeHours: "10:30-19:00",
+    giannisHours: "9:30-18:00",
+  };
+}
+
+function loadParams() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultParams();
+    const saved = JSON.parse(raw);
+    const base = defaultParams();
+    return { ...base, ...saved, rest: { ...base.rest, ...(saved.rest || {}) } };
+  } catch (e) {
+    return defaultParams();
+  }
+}
+
+function saveParams() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(params));
+}
+
+let params = loadParams();
+
+function effectiveRestDay(person) {
+  const baseIndex = DAY_NAMES.indexOf(params.rest[person]);
+  const offset = rotationOffsetFor(params.weekStart);
+  return DAY_NAMES[(baseIndex + offset) % 7];
+}
+
+function naturalShift(person, dayIndex) {
+  const restDay = effectiveRestDay(person);
+  const cur = DAY_NAMES[dayIndex];
+  const next = DAY_NAMES[(dayIndex + 1) % 7];
+  if (cur === restDay) return "Ρεπό";
+  if (next === restDay) return "Άνοιγμα";
+  return "Κλείσιμο";
+}
+
+function openingCountNatural(dayIndex) {
+  return PEOPLE.filter((p) => naturalShift(p, dayIndex) === "Άνοιγμα").length;
+}
+
+function chosenFallbackOpener(dayIndex) {
+  if (openingCountNatural(dayIndex) > 0) return null;
+  const working = PEOPLE.filter((p) => naturalShift(p, dayIndex) === "Κλείσιμο");
+  if (working.length === 0) return null;
+  return working.includes(params.backupOpener) ? params.backupOpener : working[0];
+}
+
+function effectiveShift(person, dayIndex) {
+  const natural = naturalShift(person, dayIndex);
+  if (natural !== "Κλείσιμο") return natural;
+  if (chosenFallbackOpener(dayIndex) === person) {
+    return "Άνοιγμα";
+  }
+  return natural;
+}
+
+function poolAssignment(person, dayIndex) {
+  if (effectiveShift(person, dayIndex) === "Ρεπό") return "";
+  const rotatorIndex = ROTATORS.indexOf(person);
+  const offset = rotationOffsetFor(params.weekStart);
+  return (dayIndex + rotatorIndex + offset) % 2 === 0 ? "Main Pool" : "Splash Pool";
+}
+
+function positionForDay(position, dayIndex) {
+  const giannisShift = effectiveShift("Γιάννης", dayIndex);
+  const odysseasShift = effectiveShift("Οδυσσέας", dayIndex);
+  if (position === BEACH) {
+    if (giannisShift !== "Ρεπό") return "Γιάννης";
+    if (odysseasShift !== "Ρεπό") return "Οδυσσέας";
+    return "";
+  }
+  if (position === "Infinity Pool") {
+    if (giannisShift !== "Ρεπό" && odysseasShift !== "Ρεπό") return "Οδυσσέας";
+    const coverageShift = effectiveShift(params.infinityCoverage, dayIndex);
+    return coverageShift !== "Ρεπό" ? params.infinityCoverage : "";
+  }
+  const names = ROTATORS.filter((r) => poolAssignment(r, dayIndex) === position);
+  return names.join(" / ");
+}
+
+function hoursForDay(person, dayIndex) {
+  const effective = effectiveShift(person, dayIndex);
+  if (effective === "Ρεπό") return "";
+  if (effective === "Άνοιγμα") return params.openHours;
+  return person === "Γιάννης" ? params.giannisHours : params.closeHours;
+}
+
+function dayDates() {
+  const start = new Date(params.weekStart + "T00:00:00");
+  return DAY_NAMES.map((_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+}
+
+function fmtDate(d) {
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${d.getFullYear()}`;
+}
+
+function buildHeaderRow() {
+  const dates = dayDates();
+  let html = "<thead><tr><th class='rowlabel'>Ημέρα</th>";
+  DAY_NAMES.forEach((name, i) => {
+    html += `<th>${name}<br><small>${fmtDate(dates[i])}</small></th>`;
+  });
+  html += "</tr></thead>";
+  return html;
+}
+
+function renderShiftTable() {
+  const table = document.getElementById("shiftTable");
+  let html = buildHeaderRow() + "<tbody>";
+  PEOPLE.forEach((person) => {
+    html += `<tr><td class="rowlabel">${person}</td>`;
+    for (let d = 0; d < 7; d++) {
+      const shift = effectiveShift(person, d);
+      html += `<td class="shift-${shift}">${shift}</td>`;
+    }
+    html += "</tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+function renderPositionTable() {
+  const table = document.getElementById("positionTable");
+  let html = buildHeaderRow() + "<tbody>";
+  POSITIONS.forEach((position) => {
+    html += `<tr><td class="rowlabel">${position}</td>`;
+    for (let d = 0; d < 7; d++) {
+      html += `<td>${positionForDay(position, d) || "&mdash;"}</td>`;
+    }
+    html += "</tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+function renderHoursTable() {
+  const table = document.getElementById("hoursTable");
+  let html = buildHeaderRow() + "<tbody>";
+  PEOPLE.forEach((person) => {
+    html += `<tr><td class="rowlabel">${person}</td>`;
+    for (let d = 0; d < 7; d++) {
+      const shift = effectiveShift(person, d);
+      const hours = hoursForDay(person, d);
+      html += `<td class="shift-${shift}">${hours || "&mdash;"}</td>`;
+    }
+    html += "</tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+function renderCheckTable() {
+  const table = document.getElementById("checkTable");
+  let html = buildHeaderRow() + "<tbody>";
+  html += `<tr><td class="rowlabel">Άνοιγμα (&ge;1)</td>`;
+  for (let d = 0; d < 7; d++) {
+    const count = PEOPLE.filter((p) => effectiveShift(p, d) === "Άνοιγμα").length;
+    html += `<td class="${count >= 1 ? "check-ok" : "check-bad"}">${count}</td>`;
+  }
+  html += "</tr>";
+  html += `<tr><td class="rowlabel">Κλείσιμο (&ge;3)</td>`;
+  for (let d = 0; d < 7; d++) {
+    const count = PEOPLE.filter((p) => effectiveShift(p, d) === "Κλείσιμο").length;
+    html += `<td class="${count >= 3 ? "check-ok" : "check-bad"}">${count}</td>`;
+  }
+  html += "</tr></tbody>";
+  table.innerHTML = html;
+}
+
+function renderRotationInfo() {
+  const offset = rotationOffsetFor(params.weekStart);
+  const note = document.getElementById("rotationNote");
+  if (note) {
+    note.textContent = offset === 0
+      ? "Μετάθεση αυτής της εβδομάδας: καμία (τιμές όπως ακριβώς τις έχεις ορίσει)."
+      : `Μετάθεση αυτής της εβδομάδας: +${offset} ημέρα${offset === 1 ? "" : "ες"} (κυκλικά προς τα δεξιά) σε σχέση με τις βασικές τιμές.`;
+  }
+  document.querySelectorAll(".rest-hint").forEach((hint) => {
+    const person = hint.dataset.person;
+    hint.textContent = `Αυτή την εβδομάδα: ${effectiveRestDay(person)}`;
+  });
+}
+
+function renderAll() {
+  renderRotationInfo();
+  renderShiftTable();
+  renderPositionTable();
+  renderHoursTable();
+  renderCheckTable();
+}
+
+function buildDaySelect(selected) {
+  const sel = document.createElement("select");
+  DAY_NAMES.forEach((day) => {
+    const opt = document.createElement("option");
+    opt.value = day;
+    opt.textContent = day;
+    if (day === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  return sel;
+}
+
+function buildPeopleSelect(selected) {
+  const sel = document.createElement("select");
+  PEOPLE.forEach((p) => {
+    const opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p;
+    if (p === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  return sel;
+}
+
+function buildForm() {
+  document.getElementById("weekStart").value = params.weekStart;
+  document.getElementById("weekStart").addEventListener("input", (e) => {
+    if (!e.target.value) return;
+    params.weekStart = e.target.value;
+    saveParams();
+    renderAll();
+  });
+
+  const restContainer = document.getElementById("peopleRest");
+  restContainer.innerHTML = "";
+  PEOPLE.forEach((person) => {
+    const field = document.createElement("div");
+    field.className = "field";
+    const label = document.createElement("label");
+    label.textContent = `${person} — Ρεπό (βάση, αυτή την εβδομάδα)`;
+    const sel = buildDaySelect(params.rest[person]);
+    sel.addEventListener("change", (e) => {
+      params.rest[person] = e.target.value;
+      saveParams();
+      renderAll();
+    });
+    const hint = document.createElement("small");
+    hint.className = "rest-hint";
+    hint.dataset.person = person;
+    hint.style.color = "var(--muted)";
+    field.appendChild(label);
+    field.appendChild(sel);
+    field.appendChild(hint);
+    restContainer.appendChild(field);
+  });
+
+  const infinitySel = buildPeopleSelect(params.infinityCoverage);
+  infinitySel.id = "infinityCoverage";
+  infinitySel.addEventListener("change", (e) => {
+    params.infinityCoverage = e.target.value;
+    saveParams();
+    renderAll();
+  });
+  document.getElementById("infinityCoverage").replaceWith(infinitySel);
+
+  const backupSel = buildPeopleSelect(params.backupOpener);
+  backupSel.id = "backupOpener";
+  backupSel.addEventListener("change", (e) => {
+    params.backupOpener = e.target.value;
+    saveParams();
+    renderAll();
+  });
+  document.getElementById("backupOpener").replaceWith(backupSel);
+
+  const hoursFields = [
+    ["openHours", "openHours"],
+    ["closeHours", "closeHours"],
+    ["giannisHours", "giannisHours"],
+  ];
+  hoursFields.forEach(([id, key]) => {
+    const input = document.getElementById(id);
+    input.value = params[key];
+    input.addEventListener("input", (e) => {
+      params[key] = e.target.value;
+      saveParams();
+      renderAll();
+    });
+  });
+}
+
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+buildForm();
+renderAll();
+</script>
+</body>
+</html>
