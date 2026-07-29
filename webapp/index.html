@@ -6,82 +6,110 @@
 <title>Πρόγραμμα Ναυαγοσωστών</title>
 <style>
   :root {
-    --title-bg: #1F4E78;
-    --head-bg: #2E75B6;
-    --open-bg: #DDEBF7;
-    --close-bg: #FCE4D6;
-    --rest-bg: #E7E6E6;
-    --shortage-bg: #FFC7CE;
-    --shortage-fg: #9C0006;
-    --ok-bg: #C6EFCE;
-    --ok-fg: #1e6b1e;
-    --border: #B7B7B7;
-    --page-bg: #f4f6f8;
+    --accent: #3B82F6;
+    --accent-dark: #2563EB;
+    --open-bg: #DBEAFE;
+    --open-fg: #1E40AF;
+    --close-bg: #FFEDD5;
+    --close-fg: #9A3412;
+    --rest-bg: #F1F5F9;
+    --rest-fg: #64748B;
+    --shortage-bg: #FEE2E2;
+    --shortage-fg: #B91C1C;
+    --ok-bg: #DCFCE7;
+    --ok-fg: #15803D;
+    --border: #E5E7EB;
+    --page-bg: #F8FAFC;
     --panel-bg: #ffffff;
-    --text: #1a1a1a;
-    --muted: #666;
+    --text: #0F172A;
+    --muted: #64748B;
+    --radius: 14px;
   }
   * { box-sizing: border-box; }
   body {
-    font-family: Arial, "Segoe UI", sans-serif;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     background: var(--page-bg);
     color: var(--text);
     margin: 0;
-    padding: 24px;
+    padding: 32px 24px;
+    line-height: 1.5;
   }
   h1 {
-    background: var(--title-bg);
-    color: #fff;
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin: 0 0 20px 0;
-    font-size: 1.4rem;
+    color: var(--text);
+    margin: 0 0 24px 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  .panel {
+  .panel, details.panel {
     background: var(--panel-bg);
-    border-radius: 8px;
-    padding: 18px 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin: 0 auto 18px auto;
+    max-width: 900px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   }
+  .panel.panel-wide { max-width: 1100px; }
   .panel h2 {
-    margin-top: 0;
-    font-size: 1.05rem;
-    color: var(--title-bg);
-    border-bottom: 2px solid var(--head-bg);
-    padding-bottom: 6px;
+    margin: 0 0 16px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
   }
   details.panel summary {
     cursor: pointer;
-    font-weight: bold;
-    color: var(--title-bg);
-    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+    list-style: none;
   }
-  details.panel[open] summary { margin-bottom: 10px; }
-  .instructions p { margin: 6px 0; line-height: 1.5; font-size: 0.92rem; }
-  .instructions strong { color: var(--title-bg); }
+  details.panel summary::-webkit-details-marker { display: none; }
+  details.panel summary::before {
+    content: "▸";
+    display: inline-block;
+    margin-right: 8px;
+    color: var(--accent);
+    transition: transform 0.15s ease;
+  }
+  details.panel[open] summary::before { transform: rotate(90deg); }
+  details.panel[open] summary { margin-bottom: 14px; }
+  .instructions p { margin: 8px 0; line-height: 1.6; font-size: 0.9rem; color: var(--muted); }
+  .instructions strong { color: var(--text); }
 
   .param-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px 20px;
+    gap: 16px 20px;
   }
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-size: 0.8rem; font-weight: bold; color: var(--muted); }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
   .field select, .field input {
-    padding: 6px 8px;
+    padding: 9px 10px;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 8px;
     font-family: inherit;
     font-size: 0.9rem;
-    background: #fff;
+    background: var(--page-bg);
     color: var(--text);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
+  .field select:hover, .field input:hover { border-color: #CBD5E1; }
+  .field select:focus, .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background: #fff;
+  }
+  .rest-hint { color: var(--muted); font-size: 0.78rem; }
   .people-rest {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
   }
 
   table {
@@ -89,36 +117,58 @@
     width: 100%;
     font-size: 0.85rem;
   }
-  .table-scroll { overflow-x: auto; }
+  .table-scroll { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
   th, td {
-    border: 1px solid var(--border);
-    padding: 6px 8px;
+    padding: 9px 12px;
     text-align: center;
     white-space: nowrap;
+    border-bottom: 1px solid var(--border);
   }
+  tbody tr:last-child td { border-bottom: none; }
   thead th {
-    background: var(--head-bg);
-    color: #fff;
+    background: var(--page-bg);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--border);
   }
   td.rowlabel, th.rowlabel {
     text-align: left;
-    font-weight: bold;
-    background: #f0f0f0;
+    font-weight: 600;
+    color: var(--text);
     white-space: nowrap;
   }
-  .shift-Ρεπό { background: var(--rest-bg); }
-  .shift-Άνοιγμα { background: var(--open-bg); }
-  .shift-Κλείσιμο { background: var(--close-bg); }
-  .check-bad { background: var(--shortage-bg); color: var(--shortage-fg); font-weight: bold; }
-  .check-ok { background: var(--ok-bg); color: var(--ok-fg); font-weight: bold; }
+  .shift-Ρεπό { background: var(--rest-bg); color: var(--rest-fg); }
+  .shift-Άνοιγμα { background: var(--open-bg); color: var(--open-fg); }
+  .shift-Κλείσιμο { background: var(--close-bg); color: var(--close-fg); }
+  .check-bad { background: var(--shortage-bg); color: var(--shortage-fg); font-weight: 600; }
+  .check-ok { background: var(--ok-bg); color: var(--ok-fg); font-weight: 600; }
   .section-gap { margin-top: 22px; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 0.8rem; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 0.78rem; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: inline-block; }
+  .swatch { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
   footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 30px; }
+  .print-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .print-actions button {
+    padding: 10px 22px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  #printBtn { border: none; background: var(--accent); color: #fff; }
+  #printBtn:hover { background: var(--accent-dark); }
+  .btn-secondary { border: 1px solid var(--border); background: #fff; color: var(--text); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent-dark); }
   @media print {
     details.panel:not(.always-print) { display: none; }
+    .print-actions, footer { display: none; }
     body { background: #fff; padding: 0; }
+    body.print-only-hours > *:not(#hoursPanel) { display: none !important; }
+    body.print-only-positions > *:not(#positionsPanel) { display: none !important; }
   }
 </style>
 </head>
@@ -130,7 +180,7 @@
   <summary>Οδηγίες</summary>
   <div class="instructions">
     <p><strong>Τι είναι:</strong> Εβδομαδιαίο πρόγραμμα για 7 ναυαγοσώστες σε 5 θέσεις (Μπουσουλάς, Infinity Pool, Main Pool, Splash Pool, All Around). Άλλαξε τις παραμέτρους παρακάτω και το πρόγραμμα ενημερώνεται αμέσως.</p>
-    <p><strong>Κανόνες:</strong> Ο Γιάννης είναι πάντα στον Μπουσουλά όποτε δουλεύει. Ο Οδυσσέας είναι πάντα στο Infinity Pool όποτε δουλεύει. Καθένας έχει 1 ρεπό/εβδομάδα. Την ημέρα πριν το ρεπό του κάνει «Άνοιγμα», τις άλλες μέρες «Κλείσιμο». Στο ρεπό του Γιάννη, ο Οδυσσέας καλύπτει τον Μπουσουλά. Όποτε ο Οδυσσέας λείπει από το Infinity Pool, καλύπτει ο ναυαγοσώστης που έχεις ορίσει στην «Κάλυψη Infinity Pool». Από τους υπόλοιπους ναυαγοσώστες πισίνας, πάντα ακριβώς 2 πάνε Main Pool και έως 2 πάνε Splash Pool· όποιος περισσέψει πέρα από αυτούς παίρνει τη θέση «All Around».</p>
+    <p><strong>Κανόνες:</strong> Ο Γιάννης είναι πάντα στον Μπουσουλά όποτε δουλεύει. Ο Οδυσσέας είναι πάντα στο Infinity Pool όποτε δουλεύει. Καθένας έχει 1 ρεπό/εβδομάδα. Την ημέρα πριν το ρεπό του κάνει «Άνοιγμα», τις άλλες μέρες «Κλείσιμο». Στο ρεπό του Γιάννη, ο Οδυσσέας καλύπτει τον Μπουσουλά. Όποτε ο Οδυσσέας λείπει από το Infinity Pool, καλύπτει ο ναυαγοσώστης που έχεις ορίσει στην «Κάλυψη Infinity Pool». Ο Ραφαήλ είναι πάντα στο «All Around» όποτε δουλεύει στην πισίνα (εκτός αν καλύπτει το Infinity Pool)· στο ρεπό του, τη θέση «All Around» παίρνει η Γιώτα. Από τους υπόλοιπους ναυαγοσώστες πισίνας, πάντα ακριβώς 2 πάνε Main Pool και έως 2 πάνε Splash Pool· όποιος περισσέψει πέρα από αυτούς παίρνει κι αυτός τη θέση «All Around».</p>
     <p><strong>Μέρες χωρίς φυσικά αρκετά «Άνοιγμα»:</strong> Θέλουμε πάντα τουλάχιστον 2 άτομα σε «Άνοιγμα» κάθε μέρα. Όποτε η φυσική αντιστοίχιση ρεπό δίνει λιγότερα, ανοίγει αυτόματα κι άλλος που δουλεύει εκείνη τη μέρα — επιλέγεται με κυκλική εναλλαγή ανάμεσα σε όλους εκτός του Γιάννη (ξεκινώντας κατά προτίμηση από τον «Εφεδρικός Ανοίγματος», αν δουλεύει εκείνη τη μέρα), ώστε να μην ανοίγει πάντα το ίδιο άτομο. Ο Γιάννης εξαιρείται από αυτόν τον κυκλικό «έκτακτο άνοιγμα» — ανοίγει μόνο τη φυσική μέρα πριν το δικό του ρεπό, ώστε να μένει σταθερό το κανονικό του ωράριο (9:30-18:00). Με 7 άτομα (1 ρεπό/μέρα) αυτό αφήνει συνήθως 4 σε «Κλείσιμο», πάνω από το ελάχιστο των 3.</p>
     <p><strong>Κυκλική μετάθεση ρεπό &amp; ποστών:</strong> Τα ρεπό στις Παραμέτρους ισχύουν ακριβώς όπως τα βλέπεις για την τρέχουσα πραγματική εβδομάδα. Κάθε επόμενη εβδομάδα, το ρεπό του καθενός μετατίθεται κυκλικά μία μέρα προς τα δεξιά (π.χ. όποιος είχε Κυριακή θα έχει Δευτέρα την επόμενη), και ομοίως εναλλάσσεται η κατανομή Main/Splash Pool — έτσι η δίκαιη κατανομή διατηρείται αυτόματα εβδομάδα με την εβδομάδα, χωρίς να χρειάζεται να ξαναγράφεις τίποτα. Δίπλα σε κάθε ρεπό βλέπεις την ενεργή τιμή για την επιλεγμένη εβδομάδα.</p>
     <p><strong>Χρωματικός κώδικας:</strong> Γαλάζιο = Άνοιγμα. Πορτοκαλί = Κλείσιμο. Γκρι = Ρεπό. Πράσινο/κόκκινο στους ελέγχους = επαρκής/ανεπαρκής κάλυψη.</p>
@@ -171,7 +221,7 @@
   </div>
 </div>
 
-<div class="panel">
+<div class="panel panel-wide">
   <h2>Τελικές Βάρδιες</h2>
   <div class="table-scroll"><table id="shiftTable"></table></div>
   <div class="legend">
@@ -181,17 +231,17 @@
   </div>
 </div>
 
-<div class="panel">
+<div class="panel panel-wide" id="positionsPanel">
   <h2>Θέσεις Εργασίας</h2>
   <div class="table-scroll"><table id="positionTable"></table></div>
 </div>
 
-<div class="panel">
+<div class="panel panel-wide" id="hoursPanel">
   <h2>Βοηθητικός Πίνακας Ωρών</h2>
   <div class="table-scroll"><table id="hoursTable"></table></div>
 </div>
 
-<div class="panel">
+<div class="panel panel-wide">
   <h2>Έλεγχος Κάλυψης</h2>
   <div class="table-scroll"><table id="checkTable"></table></div>
   <div class="legend">
@@ -200,8 +250,10 @@
   </div>
 </div>
 
-<div style="text-align:center; margin-bottom:20px;">
-  <button id="printBtn" style="padding:8px 18px; font-size:0.9rem; border-radius:6px; border:1px solid var(--border); background:var(--head-bg); color:#fff; cursor:pointer;">Εκτύπωση / PDF</button>
+<div class="print-actions">
+  <button id="printBtn">Εκτύπωση / PDF</button>
+  <button id="printHoursBtn" class="btn-secondary">Εκτύπωση Ωρών</button>
+  <button id="printPositionsBtn" class="btn-secondary">Εκτύπωση Θέσεων</button>
 </div>
 
 <footer>Πρόγραμμα Ναυαγοσωστών &mdash; όλα τα δεδομένα αποθηκεύονται τοπικά στον browser σου.</footer>
@@ -353,13 +405,26 @@ const SPLASH_POOL_SIZE = 2;
 // assigned the "All Around" position instead of overloading a pool. The
 // ordering rotates by day and by week (via rotationOffsetFor) so who lands in
 // which bucket is spread fairly over time rather than fixed by name.
+//
+// Ραφαήλ is pinned to "All Around" every day he's in the pool rotation (unless
+// he's covering Infinity Pool instead). On his ρεπό, Γιώτα takes "All Around"
+// in his place so the position is never left uncovered by the pin.
 function dayPoolGroups(dayIndex) {
   const infinityPerson = positionForDay("Infinity Pool", dayIndex);
   const offset = rotationOffsetFor(params.weekStart);
   const candidates = ROTATORS.filter(
     (r) => effectiveShift(r, dayIndex) !== "Ρεπό" && r !== infinityPerson
   );
-  const ordered = [...candidates].sort((a, b) => {
+
+  const pinnedAllAround = [];
+  if (candidates.includes("Ραφαήλ")) {
+    pinnedAllAround.push("Ραφαήλ");
+  } else if (effectiveShift("Ραφαήλ", dayIndex) === "Ρεπό" && candidates.includes("Γιώτα")) {
+    pinnedAllAround.push("Γιώτα");
+  }
+
+  const remaining = candidates.filter((r) => !pinnedAllAround.includes(r));
+  const ordered = [...remaining].sort((a, b) => {
     const keyA = (ROTATORS.indexOf(a) + dayIndex + offset) % ROTATORS.length;
     const keyB = (ROTATORS.indexOf(b) + dayIndex + offset) % ROTATORS.length;
     return keyA - keyB;
@@ -367,7 +432,7 @@ function dayPoolGroups(dayIndex) {
   return {
     main: ordered.slice(0, MAIN_POOL_SIZE),
     splash: ordered.slice(MAIN_POOL_SIZE, MAIN_POOL_SIZE + SPLASH_POOL_SIZE),
-    allAround: ordered.slice(MAIN_POOL_SIZE + SPLASH_POOL_SIZE),
+    allAround: [...pinnedAllAround, ...ordered.slice(MAIN_POOL_SIZE + SPLASH_POOL_SIZE)],
   };
 }
 
@@ -598,7 +663,15 @@ function buildForm() {
   });
 }
 
+function printOnly(bodyClass) {
+  document.body.classList.add(bodyClass);
+  window.addEventListener("afterprint", () => document.body.classList.remove(bodyClass), { once: true });
+  window.print();
+}
+
 document.getElementById("printBtn").addEventListener("click", () => window.print());
+document.getElementById("printHoursBtn").addEventListener("click", () => printOnly("print-only-hours"));
+document.getElementById("printPositionsBtn").addEventListener("click", () => printOnly("print-only-positions"));
 
 buildForm();
 renderAll();
